@@ -1,0 +1,37 @@
+<%= form_for(@tablet) do |f| %>
+  <% if @tablet.errors.any? %>
+    <div id="error_explanation">
+      <h2><%= pluralize(@tablet.errors.count, "error") %> prohibited this tablet from being saved:</h2>
+
+      <ul>
+      <% @tablet.errors.full_messages.each do |message| %>
+        <li><%= message %></li>
+      <% end %>
+      </ul>
+    </div>
+  <% end %>
+
+  <div class="field">
+    <%= f.label :uuid %><br>
+    <%= f.text_field :uuid %>
+  </div>
+  <div class="field">
+    <%= f.label :flash_token %><br>
+    <%= f.text_field :flash_token %>
+  </div>
+  <div class="field">
+    <%= f.label :salt %><br>
+    <%= f.text_field :salt %>
+  </div>
+  <div class="field">
+    <%= f.label :flash_date %><br>
+    <%= f.datetime_select :flash_date %>
+  </div>
+  <div class="field">
+    <%= f.label :user_id %><br>
+    <%= f.text_field :user_id %>
+  </div>
+  <div class="actions">
+    <%= f.submit %>
+  </div>
+<% end %>

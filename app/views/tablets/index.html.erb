@@ -1,0 +1,33 @@
+<h1>Listing tablets</h1>
+
+<table>
+  <thead>
+    <tr>
+      <th>Uuid</th>
+      <th>Flash token</th>
+      <th>Salt</th>
+      <th>Flash date</th>
+      <th>User</th>
+      <th colspan="3"></th>
+    </tr>
+  </thead>
+
+  <tbody>
+    <% @tablets.each do |tablet| %>
+      <tr>
+        <td><%= tablet.uuid %></td>
+        <td><%= tablet.flash_token %></td>
+        <td><%= tablet.salt %></td>
+        <td><%= tablet.flash_date %></td>
+        <td><%= tablet.user %></td>
+        <td><%= link_to 'Show', tablet %></td>
+        <td><%= link_to 'Edit', edit_tablet_path(tablet) %></td>
+        <td><%= link_to 'Destroy', tablet, method: :delete, data: { confirm: 'Are you sure?' } %></td>
+      </tr>
+    <% end %>
+  </tbody>
+</table>
+
+<br>
+
+<%= link_to 'New Tablet', new_tablet_path %>

@@ -1,0 +1,533 @@
+Eurocase-Autos Rails
+===============
+
+This backend is intended to be used by the Eurocase-Autos Tablet Launcher and Location Tracking App.
+
+
+Database Tables
+-------------
+
+### Ads
+
+Ads represent what the investors want to communicate to the end users.
+
+```js
+{
+	id: <long>
+	picture_url: <string, valid url>,
+	destionation_url: <string, valid url>,
+	description: <text, up to 100 chars long>
+}
+```
+
+### Users
+
+Users represent the end user, this is the owner or buyer of the device. A User can have many Tablets associated.
+
+```js
+{
+	id: <long>
+	email: <string, valid email>,
+	token: <string>
+}
+```
+
+### Tablets
+
+Tablets represent the main device. This is used to keep track of the flash status and the last device Location.
+
+```js
+{
+	uuid: <string>,
+	flash_token: <string>,
+	salt: <string>,
+	flash_date: <timestamp>
+	user_id: <index, can be null>
+}
+```
+
+### Locations
+
+Locations represent the tablet geographic position at a given time.
+
+```js
+{
+	latitude: <float>,
+	longitude: <float>,
+	date: <timestamp>,
+	tablet_id <index>
+}
+```
+
+API Client
+------
+
+Guide for the Android/iOS application.
+
+### Use cases
+
+1. Create User, from the Tracking Center in a valid flashed Tablet
+2. Login User, from the client Tracking application
+3. Create Tablet, from the flasher app
+4. Associate a Tablet with a User, for tracking the location.
+5. Deassociate a Tablet
+6. Update Tablet's Location
+7. List the User associated Tablets.
+
+
+##### Create User
+Tracking Center app has a Login with Google+ button. When this login ends successfully, the User is created in the backend.
+
+The request is a POST with the User's email and a generated secret. The secret is generated with the email and a "secret word" that the client and the backend know.
+```js
+POST "/users"
+{
+    email: "valid_email@address.com",
+    secret: "h298jdisjo20jd20h4adsf"
+}
+```
+
+- If authentication is sucessful Node response will be a Packet with the `"Success"` code.
+- If authentication fails, the Packet code will be `"Error"`.
+
+##### Connected: Send/Receive message
+Clients send/receive a valid `Message` Packet via WebSocket.
+
+* Send:
+```js
+{
+    from_id: "12",
+    to_id: "3",
+    pepper: "sdh12j3hjhds893ndsk3",
+    text: "Lorem ipsum dolor sit amet, consectetur adipiscing elit"
+}
+```
+
+* Receive:
+```js
+{
+    _id: "53d01ea8905792ba0e8a34a8",
+    from_id: "12",
+    to_id: "3",
+    pepper: "sdh12j3hjhds893ndsk3",
+    text: "Lorem ipsum dolor sit amet, consectetur adipiscing elit",
+    date: 'YYYY-MM-DD HH:mm:ss:SSS'
+}
+```
+
+##### Connected: Request/Receive global history messages
+Clients send/receive a valid `AllMessages` Packet via WebSocket.
+
+* Request:
+```js
+{
+    previous_message_id: "53d01ea8905792ba0e8a34a8"
+}
+```
+
+* Receive:
+```js
+{
+    previous_message_id: "53d01ea8905792ba0e8a34a8",
+    messages: [<message_1>, <message_2>, ..]
+}
+```
+
+##### Connected: Request/Receive channel history messages
+Clients send/receive a valid `ChannelMessages` Packet via WebSocket.
+
+* Request:
+```js
+{
+    previous_message_id: "53d01ea8905792ba0e8a34a8",
+    to_id: "2",
+}
+```
+
+* Response:
+```js
+{
+    previous_message_id: "53d01ea8905792ba0e8a34a8",
+    to_id: "2",
+    messages: [<message_1>, <message_2>, ..]
+}
+```
+
+##### Connected: New channel opened
+Clients receive a valid `NewChannel` Packet via WebSocket.
+
+##### Disconnected: Receive message
+Clients receive a valid `Message` Packet via Push notification (if registered).
+
+##### Disconnected: New channel opened
+Clients receive a valid `NewChannel` Packet via Push notification (if registered).
+
+
+Node Websocket Server
+------
+
+Guide for the NODE.js application.
+
+### Main logic
+
+#### Connect & Authenticate
+
+* WebSocket instance holds a boolean if authenticated:
+`ws.authenticated` should be true before using the other operations.
+
+#### Global Messages History
+
+* Query the DB for Messages with date greater than the given `previous_message_id` date.
+
+Related methods: 
+
+```js
+packet_all_messages(packet);
+prepare_and_send_query_response(results, packet);
+```
+
+#### Channel Messages History
+
+* Query the DB for Messages with the `to_id` and `from_id` properties related to the `channel_id` they have requested us, with date greater than the given `previous_message_id` date.
+
+Related methods: 
+
+```js
+packet_channel_messages(packet);
+prepare_and_send_query_response(results, packet);
+```
+
+#### Send Message
+
+* Try to send the Packet over WebSocket, if not connected then try to send a Push notification.
+
+Related methods: 
+
+```js
+packet_message(packet);
+```
+
+#### Send New Channel
+
+* This will only be called from the Rest API: Rails POST a New Channel.
+
+Related methods: 
+
+```js
+packet_new_channel(channel)
+```
+
+
+
+### Database
+
+MongoDB with Mongoose module, all the way.
+http://www.mongodb.org 
+http://mongoosejs.com
+
+
+#### Message
+
+* Model:
+
+```js
+{
+    from_id: String,
+    to_id: String,
+    text: String,
+    pepper: String,
+    date: { type: Date, default: Date.now }
+}
+```
+
+* Queries:
+
+Messages with specific id.
+
+```js
+Message.find({ _id: "53d01ea8905792ba0e8a34a8" }).exec(callback);
+```
+
+Messages from specific user, sorted by date.
+
+```js
+Message.where(from_id: "12").sort('date').exec(callback);
+```
+
+
+#### User
+
+* Model:
+
+```js
+{
+	_id: {
+        type: String,
+        unique: true,
+        required: true
+    },
+    name: {
+        type: String,
+        required: true
+    },
+    auth_token: {
+        type: String,
+        unique: true,
+        required: true
+    }
+}
+```
+
+* Queries:
+
+User with specific ID
+
+```js
+User.find({ _id: "3" }).exec(callback);
+```
+
+All users
+
+```js
+User.find().exec(callback)
+```
+
+#### Channel
+
+* Model:
+
+```js
+{
+	_id: {
+        type: String,
+        unique: true,
+        required: true
+    },
+    user1_id: Number,
+    user2_id: Number,
+    date: { 
+        type: Date, 
+        default: Date.now
+    } 
+}
+```
+
+* Queries:
+
+Channel with specific ID
+
+```js
+Channel.find({ _id: "1" }).exec(callback);
+```
+
+All channels
+
+```js
+Channel.find().exec(callback)
+```
+
+
+Rest API
+-----
+
+We've decided to use express.js a "Sinatra inspired web development framework for node.js -- insanely fast, flexible, and simple"
+* Actually, if you go and check the `express_app.js` file, you'll see it's pretty self-explanatory
+* Note: we're using port 8081 for this.
+
+
+### User
+#### New user
+* Note: this is used only when the Rails server has a new user created. Then the node.js server will save it as well in its MongoDB.
+
+POST `/api/users`
+
+* params:
+
+```js
+{
+	user_id: "2",
+	user_name: "Quique",
+    auth_token: "ndoqnew0823nos"
+}
+```
+
+* So far, the node.js server replies with a JSON that looks like this:
+
+```js
+{ 
+    message: 'User created!'
+}
+```
+It would be ideal to work with authentifications in the future. 
+
+#### Show all users
+
+GET `/api/users`
+* You'll get all the users in a JSON format.
+
+#### Show user
+GET `/api/users/:user_id`
+* It will show you the user in JSON format.
+
+#### Update a user
+PUT `/api/users/:user_id`
+
+* params:
+```js
+{
+    user_id: "2",
+    user_name: "Quique",
+    auth_token: "ndoqnew0823nos"
+}
+```
+
+* So far, the node.js server replies with a Json that looks like this:
+
+```js
+{ 
+    message: 'User updated!'
+}
+```
+
+#### Delete a user
+DELETE `/api/users/:user_id`
+
+* So far, the node.js server replies with a Json that looks like this:
+
+```js
+{ 
+    message: 'Successfully deleted'
+}
+```
+
+
+### Channel
+#### New channel
+* Note: this is used only when the Rails server creates a match between two users, so a channel has to be created on the node.js server side. Then the node.js server will save it as well in its MongoDB.
+
+POST `/api/channels`
+
+* params:
+
+```js
+{
+	id:
+	user1:
+	user2:
+}
+```
+
+* So far, the node.js server replies with a JSON that looks like this:
+
+```js
+{ 
+    message: 'Channel created!'
+}
+```
+
+
+### Push Notifications
+#### Receive iOS
+
+* Receive a Message on an iOS device. 
+
+```js
+{
+    sound: "default",
+    device: "[other_user_name]: [message]"
+}
+```
+
+* Receive a NewChannel on an iOS device. 
+
+```js
+{
+    sound: "default",
+    device: "New Snag with [other_user_name]"
+}
+```
+
+#### Receive Android
+
+* Receive a Message on an Android device. 
+
+```js
+{
+    collapseKey: "Message",
+    data: 
+        { 
+            message: "[message]" 
+        }
+}
+```
+
+* Receive a NewChannel on an Android device. 
+
+```js
+{
+    collapseKey: "NewChannel",
+    data: 
+        { 
+            message: "[message]" 
+        }
+}
+```
+
+#### Subscribe & Unsubscribe
+
+POST `/api/push_subscribe`
+
+* Subscribe a device to the Push notification service. The request must include a json body like this:
+
+```js
+{
+	user: "12",
+	device: "android" or "ios",
+	token: "1uh23ih31ns1-21ejn12-frji49-dqwdkncpd3inc209n"
+}
+```
+
+POST `/api/push_unsubscribe`
+
+* Remove a subscribed device from the push service list. Note that APN/GCM servers will notify Node if we send invalid/expired tokens, so we can remove them from the DB instantly. 
+* This should only be used if the mobile apps offer notification configuration (on/off). The request must include a json body like this:
+
+```js
+{
+	user: "12",	//Optional
+	token: "1uh23ih31ns1-21ejn12-frji49-dqwdkncpd3inc209n"	//Optional
+}
+```
+* If user is supplied, all the tokens associated with that user will be removed.
+* If token is supplied, only the given token will be removed.
+
+#### Test
+
+POST `/api/push_test`
+
+* Used to test the push notification service. The body must include a valid `Message` Packet.
+
+
+Whole Application Tests
+-----
+* They're done with Mocha
+* Note that should.js library is used to make it more verbose :)
+
+Run them with `make test` or `mocha -R nyan` (the `-R nyan` is super important)
+
+
+#### Server start command
+---------------------
+The server can be started typing on the Terminal
+
+```js
+node app.js
+```
+
+But as we want the server to be persistent and stay online even if a crash occurs, we included the gem "Forever" (https://github.com/nodejitsu/forever)and start the server with this command:
+
+```js
+sudo forever start -l forever.log -o out.log -e error.log -a app.js
+```
+
+(Sudo is for getting write permissions on that folder for the logs.)

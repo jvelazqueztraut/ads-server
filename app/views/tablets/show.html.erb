@@ -1,0 +1,29 @@
+<p id="notice"><%= notice %></p>
+
+<p>
+  <strong>Uuid:</strong>
+  <%= @tablet.uuid %>
+</p>
+
+<p>
+  <strong>Flash token:</strong>
+  <%= @tablet.flash_token %>
+</p>
+
+<p>
+  <strong>Salt:</strong>
+  <%= @tablet.salt %>
+</p>
+
+<p>
+  <strong>Flash date:</strong>
+  <%= @tablet.flash_date %>
+</p>
+
+<p>
+  <strong>User:</strong>
+  <%= @tablet.user %>
+</p>
+
+<%= link_to 'Edit', edit_tablet_path(@tablet) %> |
+<%= link_to 'Back', tablets_path %>
