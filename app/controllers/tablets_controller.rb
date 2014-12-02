@@ -20,9 +20,12 @@ class TabletsController < SecurityController
   # POST /tablets
   # POST /tablets.json
   def create
-    tablet_params[:salt] = SecureRandom.base64
-    tablet_params[:flash_token] = Tablet.salt_that_token(tablet_params[:flash_token], tablet_params[:salt])
+    salt = SecureRandom.base64
+    token = Tablet.salt_that_token(tablet_params[:flash_token], salt)
     @tablet = Tablet.new(tablet_params)
+
+    @tablet.update(flash_token: token)
+    @tablet.update(salt: salt)
 
     respond_to do |format|
       if @tablet.save
@@ -52,6 +55,30 @@ class TabletsController < SecurityController
         format.json { render json: tablet }
       end
     end
+  end
+
+  def update_location
+    location_params = params[:tablet][:location]
+    if (current_tablet.location)
+      location = current_tablet.location
+      location.latitude = location_params[:latitude]
+      location.longitude = location_params[:longitude]
+      location.date = Time.now
+    else 
+      location = Location.new
+      location.latitude = location_params[:latitude]
+      location.longitude = location_params[:longitude]
+      location.date = Time.now
+    end
+    
+    respond_to do |format|
+      if current_tablet.update(location: location)
+        format.json { render json: "Ok", status: :ok }
+      else
+        format.json { render json: current_tablet.errors, status: :unprocessable_entity }
+      end
+    end
+
   end
 
   private

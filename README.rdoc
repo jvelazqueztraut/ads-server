@@ -66,42 +66,66 @@ Guide for the Android/iOS application.
 
 ### Use cases
 
-1. Create User, from the Tracking Center in a valid flashed Tablet
-2. Login User, from the client Tracking application
-3. Create Tablet, from the flasher app
-4. Associate a Tablet with a User, for tracking the location.
-5. Deassociate a Tablet
-6. Update Tablet's Location
-7. List the User associated Tablets.
+1. Create / Login User, from the Tracking Center in a valid flashed Tablet or from the Tracking app
+2. Create Tablet, from the flasher app
+3. Associate a Tablet with a User, for tracking the location.
+4. Deassociate a Tablet
+5. Update Tablet's Location
+6. List the User associated Tablets.
 
 
-##### Create User
+##### Create / Login User
 Tracking Center app has a Login with Google+ button. When this login ends successfully, the User is created in the backend.
 
 The request is a POST with the User's email and a generated secret. The secret is generated with the email and a "secret word" that the client and the backend know.
 ```js
 POST "/users"
+
+request:
 {
-    email: "valid_email@address.com",
+	user: 
+	{
+		email: "valid_email@address.com",
     secret: "h298jdisjo20jd20h4adsf"
+	}
 }
-```
 
-- If authentication is sucessful Node response will be a Packet with the `"Success"` code.
-- If authentication fails, the Packet code will be `"Error"`.
-
-##### Connected: Send/Receive message
-Clients send/receive a valid `Message` Packet via WebSocket.
-
-* Send:
-```js
+response:
 {
-    from_id: "12",
-    to_id: "3",
-    pepper: "sdh12j3hjhds893ndsk3",
-    text: "Lorem ipsum dolor sit amet, consectetur adipiscing elit"
+    user_id: "0",
+    token: "knqfi23nr02nifkpdfaodk20omengdasdasdmp234"
 }
 ```
+
+//TODO: Create a different route for creating the user for first time, only from the tablet.
+
+
+##### Create Tablet
+When the flashing progress exits successfully, a new Tablet is created on the backend.
+
+
+```js
+POST "/tablets"
+
+request:
+{
+	tablet:
+	{
+		uuid: "EUTB-239123123",
+    flash_token: "knqfi23nr02nifkpdfaodk20omengdasdasdmp234",
+    flash_date: "30/12/2015" //TODO: add time
+    secret: "h298jdisjo20jd20h4adsf"
+	}
+    
+}
+
+response:
+{
+    user_id: "0",
+    token: "knqfi23nr02nifkpdfaodk20omengdasdasdmp234"
+}
+```
+
 
 * Receive:
 ```js

@@ -17,8 +17,8 @@ class SecurityController < ApplicationController
 	private
 
     def authenticate_request!
-      tablet_id = params[:tablet_id]
       user_id = params[:user_id]
+      tablet_id = params[:tablet_id]
       if tablet_id
         p "its a tablet! validating"
         valid_tablet(tablet_id)
@@ -37,6 +37,7 @@ class SecurityController < ApplicationController
         if user_id && params[:token] == user.token
           @current_user = user
           @verified_request = true
+          p "valid request!"
         else
           render :json => { :success => false, :message => 'Salted Token Error' }, :status => 401
         end
@@ -51,11 +52,12 @@ class SecurityController < ApplicationController
     # here params.tablet.flash_token is the salted token (the one stored in my db)
     def valid_tablet(tablet_id)!
       current_tablet = Tablet.find(tablet_id)
+      tablet_params = params[:tablet]
       if current_tablet
         p "valid tablet!!!!!!!!!"
-        calculated_salted = Tablet.salt_this_token(tablet_id[:flash_token], current_tablet.salt)
+        calculated_salted = Tablet.salt_that_token(tablet_params[:flash_token], current_tablet.salt)
         local_salted = current_tablet.flash_token
-        if tablet_id[:uuid] && tablet_id[:flash_token] && calculated_salted == local_salted
+        if tablet_params[:uuid] && tablet_params[:flash_token] && calculated_salted == local_salted
           @current_tablet = current_tablet
           @verified_request = true
         else

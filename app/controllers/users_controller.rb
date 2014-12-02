@@ -34,28 +34,34 @@ class UsersController < SecurityController
   end
 
   def associate_tablet
-    t = Tablet.find_by(uuid: params[:uuid])
-    if t
-      if t.update(user_id: current_user.id)
-        format.json { render :show, status: :ok, location: current_user }
+    tablet = Tablet.find_by(uuid: params[:tablet][:uuid])
+    
+    respond_to do |format|
+      if tablet
+        if tablet.update(user_id: current_user.id)
+          format.json { render json: { tablet_id: tablet.id, uuid: tablet.uuid } }
+        else
+          format.json { render json: current_user.errors, status: :unprocessable_entity }
+        end
       else
-        format.json { render json: current_user.errors, status: :unprocessable_entity }
+          format.json { render json: "Tablet not found!", status: :unprocessable_entity }
       end
-    else
-        format.json { render json: "Tablet not found!", status: :unprocessable_entity }
     end
   end
 
-  def deassociate_tablet
-    t = Tablet.find_by(uuid: params[:uuid])
-    if t
-      if t.update(user_id: nil)
-        format.json { render :show, status: :ok, location: current_user }
+  def disassociate_tablet
+    #This method should not require validation of the tablet.flash_token 
+    tablet = Tablet.find_by(uuid: params[:uuid])
+    respond_to do |format|
+      if tablet
+        if tablet.update(user_id: nil)
+          format.json { render json: "Ok", status: :ok }
+        else
+          format.json { render json: current_user.errors, status: :unprocessable_entity }
+        end
       else
-        format.json { render json: current_user.errors, status: :unprocessable_entity }
+          format.json { render json: "Tablet not found!", status: :unprocessable_entity }
       end
-    else
-        format.json { render json: "Tablet not found!", status: :unprocessable_entity }
     end
   end
 

@@ -1,16 +1,16 @@
 Rails.application.routes.draw do
   resources :ads
-
+  
   post 'tablets' => 'tablets#create'
 
-  post 'tablets/location' => 'locations#create'
+  post 'tablets/:tablet_id/location' => 'tablets#update_location'
   get 'tablets/:tablet_id/location' => 'tablets#location_for_tablet'
 
   post 'users' => 'users#create'
 
   get 'users/:user_id/tablets' => 'tablets#user_tablets'
   post 'users/:user_id/tablets' => 'users#associate_tablet'
-  delete 'users/:user_id/tablets' => 'users#deassociate_tablet'
+  delete 'users/:user_id/tablets' => 'users#disassociate_tablet'
 
   # The priority is based upon order of creation: first created -> highest priority.
   # See how all your routes lay out with "rake routes".
