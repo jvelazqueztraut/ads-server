@@ -41,18 +41,7 @@ class TabletsController < SecurityController
       if current_user.tablets.count == 0
         format.json { render json: Array.new }
       else
-        format.json { render json: current_user.tablets }
-      end
-    end
-  end
-
-  def location_for_tablet
-    respond_to do |format|
-      if current_user.tablets.count == 0 || current_user.tablets.where(id: params[:tablet_id]).count == 0
-        format.json { render json: "Tablet not found!", status: :unprocessable_entity }
-      else
-        tablet = current_user.tablets.where(id: params[:tablet_id]).first
-        format.json { render json: tablet }
+        format.json { render json: current_user.tablets.to_json(:include => :location) }
       end
     end
   end

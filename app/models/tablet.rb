@@ -15,4 +15,5 @@ class Tablet < ActiveRecord::Base
     joined_str = [a,b,c,secret_token].join('/')
     OpenSSL::Digest::SHA256.new(joined_str.encode('UTF-8'))
   end
+
 end

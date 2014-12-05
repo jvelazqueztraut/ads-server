@@ -4,7 +4,6 @@ Rails.application.routes.draw do
   post 'tablets' => 'tablets#create'
 
   post 'tablets/:tablet_id/location' => 'tablets#update_location'
-  get 'tablets/:tablet_id/location' => 'tablets#location_for_tablet'
 
   post 'users' => 'users#create'
 
