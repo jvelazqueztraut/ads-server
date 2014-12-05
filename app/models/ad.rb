@@ -1,5 +1,5 @@
 class Ad < ActiveRecord::Base
-	validates :destination_url, :url => true
-	validates :picture_url, :url => true
+	validates_format_of :destination_url, :with => URI::regexp(%w(http https))
+	validates_format_of :picture_url, :with => URI::regexp(%w(http https))
 	validates :description, length: { maximum: 80 }
 end
