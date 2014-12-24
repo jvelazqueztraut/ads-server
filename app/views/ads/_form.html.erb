@@ -10,20 +10,24 @@
       </ul>
     </div>
   <% end %>
-
-  <div class="field">
-    <%= f.label :picture_url %><br>
-    <%= f.text_field :picture_url %>
-  </div>
-  <div class="field">
-    <%= f.label :destination_url %><br>
-    <%= f.text_field :destination_url %>
-  </div>
-  <div class="field">
-    <%= f.label :description %><br>
-    <%= f.text_area :description %>
-  </div>
-  <div class="actions">
-    <%= f.submit %>
+  <div class="form-container">
+    <div class="inline-fields">
+      <div class="picture-url-field">
+        <strong class="field-number">1- </strong> <%= f.label :picture_url %><br>
+        <%= f.text_field :picture_url, class: 'text-field' %>
+      </div>
+      <div class="destination-url-field">
+        <strong class="field-number">2- </strong> <%= f.label :destination_url %><br>
+        <%= f.text_field :destination_url, class: 'text-field' %>
+      </div>
+    </div>
+    <br>
+    <div class="field">
+      <strong class="field-number">3- </strong> <%= f.label :description %><br>
+      <%= f.text_area :description, class: 'text-area' %>
+    </div>
+    <div class="actions">
+      <%= f.submit 'Create Add', :class => 'submit-btn' %>
+    </div>
   </div>
 <% end %>
