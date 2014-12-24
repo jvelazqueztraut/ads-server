@@ -26,8 +26,10 @@
       <strong class="field-number">3- </strong> <%= f.label :description %><br>
       <%= f.text_area :description, class: 'text-area' %>
     </div>
-    <div class="actions">
-      <%= f.submit 'Create Add', :class => 'submit-btn' %>
-    </div>
+    <% if action_name != 'show'%>
+      <div class="actions">
+        <%= f.submit "#{action_name.capitalize} ad", :class => 'submit-btn' %>
+      </div>
+    <%end%>
   </div>
 <% end %>
