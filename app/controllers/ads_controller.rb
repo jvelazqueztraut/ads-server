@@ -19,6 +19,7 @@ class AdsController < SecurityController
   # GET /ads/1
   # GET /ads/1.json
   def show
+    render :edit
   end
 
   # GET /ads/new
