@@ -15,7 +15,7 @@
     <tbody class="ads-tbody">
       <% @ads.each do |ad| %>
         <tr>
-          <td><img src="<%= ad.picture_url %>" height="60" width="60" align="middle"  /></td>
+          <td><img src="<%= ad.picture_url %>" class="ads-preview" /></td>
           <td><%= ad.picture_url %></td>
           <td><%= ad.destination_url %></td>
           <td><%= ad.description %></td>

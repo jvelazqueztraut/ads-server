@@ -38,8 +38,8 @@ class AdsController < SecurityController
 
     respond_to do |format|
       if @ad.save
-        format.html { redirect_to @ad, notice: 'Ad was successfully created.' }
-        format.json { render :show, status: :created, location: @ad }
+        format.html { redirect_to action: :index, notice: 'Ad was successfully created.' }
+        format.json { render :index, status: :created }
       else
         format.html { render :new }
         format.json { render json: @ad.errors, status: :unprocessable_entity }
