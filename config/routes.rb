@@ -1,5 +1,5 @@
 Rails.application.routes.draw do
-  resources :ads
+  resources :ads, except: :show
   
   post 'tablets' => 'tablets#create'
 
@@ -10,6 +10,8 @@ Rails.application.routes.draw do
   get 'users/:user_id/tablets' => 'tablets#user_tablets'
   post 'users/:user_id/tablets' => 'users#associate_tablet'
   delete 'users/:user_id/tablets' => 'users#disassociate_tablet'
+
+  root 'ads#index'
 
   # The priority is based upon order of creation: first created -> highest priority.
   # See how all your routes lay out with "rake routes".
