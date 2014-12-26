@@ -52,7 +52,7 @@ class AdsController < SecurityController
   def update
     respond_to do |format|
       if @ad.update(ad_params)
-        format.html { redirect_to action: :index,, notice: 'Ad was successfully updated.' }
+        format.html { redirect_to action: :index, notice: 'Ad was successfully updated.' }
         format.json { render :index, status: :ok, location: @ad }
       else
         format.html { render :edit }
