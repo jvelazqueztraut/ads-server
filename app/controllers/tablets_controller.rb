@@ -43,7 +43,13 @@ class TabletsController < SecurityController
       if current_user.tablets.count == 0
         format.json { render json: Array.new }
       else
-        format.json { render json: current_user.tablets.to_json(:include => :location) }
+        tablets_with_location = Array.new
+        current_user.tablets.each do |t|
+          if t.location
+            tablets_with_location.push t
+          end
+        end
+        format.json { render json: tablets_with_location.to_json(:include => :location) }
       end
     end
   end
