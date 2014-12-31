@@ -7,7 +7,7 @@ class Tablet < ActiveRecord::Base
   validates :uuid, presence: true, uniqueness: true
 
   def self.salt_that_token(unsalted_token, salt)
-		return Digest::SHA1.hexdigest(unsalted_token + salt).to_s # "2aba83b05dc9c2d9db7e5d34e69787d0a5e28fc5"
+		return Digest::SHA1.hexdigest([unsalted_token, salt].join('')).to_s # "2aba83b05dc9c2d9db7e5d34e69787d0a5e28fc5"
   end
 
   def self.generate_secret(a, b) #, c)
