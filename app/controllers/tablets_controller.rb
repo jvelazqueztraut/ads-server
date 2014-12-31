@@ -22,14 +22,16 @@ class TabletsController < SecurityController
   def create
     salt = SecureRandom.base64
     token = Tablet.salt_that_token(tablet_params[:flash_token], salt)
-    @tablet = Tablet.new(tablet_params)
+
+    @tablet = Tablet.find_by(uuid: tablet_params[:uuid])
+    @tablet ||= Tablet.new(tablet_params)
 
     @tablet.update(flash_token: token)
     @tablet.update(salt: salt)
 
     respond_to do |format|
       if @tablet.save
-        format.json { render :show, status: :created, location: @tablet }
+        format.json { render json: { tablet_id: @tablet.id, flash_token: @tablet.flash_token }, status: :ok }
       else
         format.json { render json: @tablet.errors, status: :unprocessable_entity }
       end
