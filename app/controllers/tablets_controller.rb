@@ -58,13 +58,13 @@ class TabletsController < SecurityController
     location_params = params[:tablet][:location]
     location = current_tablet.location
     if (location)
-      location.update(latitude: location_params[:latitude])
-      location.update(longitude: location_params[:longitude])
+      location.update(a: location_params[:a])
+      location.update(b: location_params[:b])
       location.update(date: Time.now)
     else 
       location = Location.new
-      location.latitude = location_params[:latitude]
-      location.longitude = location_params[:longitude]
+      location.a = location_params[:a]
+      location.b = location_params[:b]
       location.date = Time.now
       location.save
     end
