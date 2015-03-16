@@ -1,7 +1,7 @@
 require 'digest/sha1'
 
 class Tablet < ActiveRecord::Base
-  has_one :location
+  has_many :location
   belongs_to :user
 
   validates :uuid, presence: true, uniqueness: true

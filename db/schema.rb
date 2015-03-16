@@ -11,7 +11,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 20141125143148) do
+ActiveRecord::Schema.define(version: 20150316185019) do
 
   create_table "ads", force: true do |t|
     t.string   "picture_url"
@@ -28,6 +28,10 @@ ActiveRecord::Schema.define(version: 20141125143148) do
     t.integer  "tablet_id"
     t.datetime "created_at"
     t.datetime "updated_at"
+    t.float    "accuracy"
+    t.float    "speed"
+    t.float    "altitude"
+    t.boolean  "is_gps_provider"
   end
 
   add_index "locations", ["tablet_id"], name: "index_locations_on_tablet_id"
