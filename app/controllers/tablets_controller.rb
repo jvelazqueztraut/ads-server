@@ -77,6 +77,6 @@ class TabletsController < SecurityController
 
     # Never trust parameters from the scary internet, only allow the white list through.
     def tablet_params
-      params.require(:tablet).permit(:uuid, :flash_token, :salt, :flash_date, :user_id)
+      params.require(:tablet).permit(:uuid, :flash_token, :salt, :flash_date, :user_id, :location)
     end
 end
