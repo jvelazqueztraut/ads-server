@@ -55,25 +55,15 @@ class TabletsController < SecurityController
   end
 
   def update_location
-    location_params = params[:tablet][:location]
-    location = current_tablet.location
-    if (location)
-      location.update(latitude: location_params[:latitude])
-      location.update(longitude: location_params[:longitude])
-      location.update(date: Time.now)
-    else 
-      location = Location.new
-      location.latitude = location_params[:latitude]
-      location.longitude = location_params[:longitude]
-      location.date = Time.now
-      location.save
-    end
+    locations = current_tablet.locations ||= Array.new
+    loc = Location.new(location_params)
+    locations << loc
     
     respond_to do |format|
-      if current_tablet.update(location: location)
+      if current_tablet.update(locations: locations)
         format.json { render json: "Ok", status: :ok }
       else
-        format.json { render json: current_tablet.errors, status: :unprocessable_entity }
+        format.json { render json: locations.errors, status: :unprocessable_entity }
       end
     end
 
