@@ -45,11 +45,11 @@ class TabletsController < SecurityController
       else
         tablets_with_location = Array.new
         current_user.tablets.each do |t|
-          if t.location
+          if t.locations
             tablets_with_location.push t
           end
         end
-        format.json { render json: tablets_with_location.to_json(:include => :location) }
+        format.json { render json: tablets_with_location.to_json(:include => :locations) }
       end
     end
   end
@@ -58,13 +58,13 @@ class TabletsController < SecurityController
     location_params = params[:tablet][:location]
     location = current_tablet.location
     if (location)
-      location.update(latitude: location_params[:a])
-      location.update(longitude: location_params[:b])
+      location.update(latitude: location_params[:latitude])
+      location.update(longitude: location_params[:longitude])
       location.update(date: Time.now)
     else 
       location = Location.new
-      location.latitude = location_params[:a]
-      location.longitude = location_params[:b]
+      location.latitude = location_params[:latitude]
+      location.longitude = location_params[:longitude]
       location.date = Time.now
       location.save
     end

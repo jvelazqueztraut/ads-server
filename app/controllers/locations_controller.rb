@@ -15,13 +15,15 @@ class LocationsController < SecurityController
   # POST /locations
   # POST /locations.json
   def create
-    current_tablet.location = Location.new(location_params)
+    locations = current_tablet.locations ||= Array.new
+    loc = Location.new(location_params)
+    locations << loc
 
     respond_to do |format|
-      if location.save
-        format.json { render :show, status: :created, location: location }
+      if current_tablet.update(locations: locations)
+        format.json { render :show, status: :created, location: loc }
       else
-        format.json { render json: location.errors, status: :unprocessable_entity }
+        format.json { render json: locations.errors, status: :unprocessable_entity }
       end
     end
   end
@@ -34,6 +36,6 @@ class LocationsController < SecurityController
 
     # Never trust parameters from the scary internet, only allow the white list through.
     def location_params
-      params.require(:location).permit(:a, :b, :date, :tablet_id)
+      params.require(:location).permit(:tablet_id, :latitude, :longitude, :altitude, :speed, :accuracy, :is_gps_provider, :date)
     end
 end
