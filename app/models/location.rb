@@ -1,6 +1,6 @@
 class Location < ActiveRecord::Base
   belongs_to :tablet, :dependent => :destroy
 
-  validates :latitude, presence: true
-  validates :longitude, presence: true
+  validates :a, presence: true
+  validates :b, presence: true
 end

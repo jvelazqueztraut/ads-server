@@ -56,7 +56,6 @@ class TabletsController < SecurityController
 
   def update_location
     loc = Location.create(tablet_params[:location])
-    p tablet_params[:location]
     current_tablet.locations << loc
     
     respond_to do |format|
