@@ -55,15 +55,15 @@ class TabletsController < SecurityController
   end
 
   def update_location
-    locations = current_tablet.locations ||= Array.new
-    loc = Location.new(params[:tablet][:location])
-    locations << loc
+    loc = Location.create(tablet_params[:location])
+    p tablet_params[:location]
+    current_tablet.locations << loc
     
     respond_to do |format|
-      if current_tablet.update(locations: locations)
+      if current_tablet.save
         format.json { render json: "Ok", status: :ok }
       else
-        format.json { render json: locations.errors, status: :unprocessable_entity }
+        format.json { render json: current_tablet.errors, status: :unprocessable_entity }
       end
     end
 
@@ -77,6 +77,6 @@ class TabletsController < SecurityController
 
     # Never trust parameters from the scary internet, only allow the white list through.
     def tablet_params
-      params.require(:tablet).permit(:uuid, :flash_token, :salt, :flash_date, :user_id, :location)
+      params.require(:tablet).permit(:uuid, :flash_token, :salt, :flash_date, :user_id, :location => [:latitude, :longitude, :altitude, :speed, :accuracy, :is_gps_provider, :date])
     end
 end
